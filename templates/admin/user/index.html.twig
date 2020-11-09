@@ -1,0 +1,61 @@
+{% extends 'admin/adminbase.html.twig' %}
+{% block body %}
+    <div class="container-fluid">
+        <div class="row no-gutters">
+            <div class="col-12">
+                <h1 class="display-4 text-center mt-5">
+                    {{ title }}
+                </h1>
+            </div>
+        </div>
+    </div>
+    <div class="container mb-5">
+        <div class="row no-gutters">
+            <div class="col-12">
+                <a href="{{ path('admin_user_create') }}" class="btn btn-success mt-5">Utworz uzytkownika</a>
+            </div>
+        </div>
+    </div>
+    <div class="container">
+        <div class="row no-gutters justify-content-center">
+            <div class="col-8">
+                {% for message in app.flashes('success') %}
+                <div class="alert alert-success alert-dismissible fade show" role="alert">
+                    <strong>{{ message }}</strong>
+                        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+    <div class="container">
+        <h2 class="col-12 mb-5">Uzytkownicy:</h2>
+
+        <table>
+            <thead>
+            <tr>
+                <th>Email</th>
+                <th>Firma</th>
+                <th>Haslo</th>
+                <th>Rola</th>
+                <th>Akcja</th>
+            </tr>
+            </thead>
+            <tbody>
+            {% for user in users %}
+                <tr>
+                <td>{{ user.email }}</td>
+                <td>{{ user.company }}</td>
+                <td>{{ user.password }}</td>
+                <td>{{ user.roles | json_encode }}</td>
+                <td><a href="{{ path('admin_user_update', {'id': user.id}) }}" class="btn-link">Modyfikuj</a></td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+
+    </div>
+
+{% endblock %}

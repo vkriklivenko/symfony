@@ -1,0 +1,60 @@
+{% extends 'admin/adminbase.html.twig' %}
+{% block body %}
+    <div class="container-fluid">
+        <div class="row no-gutters">
+            <div class="col-12">
+                <h1 class="display-4 text-center mt-5">
+                    {{ title }}
+                </h1>
+            </div>
+        </div>
+    </div>
+    <div class="container-fluid mb-5 ml-5">
+        <div class="row no-gutters">
+            <div class="col-12">
+                <a href="{{ path('admin_creator_create') }}" class="btn btn-success mt-5">Utworz uzytkownika(wspolautora)</a>
+            </div>
+        </div>
+    </div>
+
+    <div class="container">
+        <div class="row no-gutters justify-content-center">
+            <div class="col-8">
+                {% for message in app.flashes('success') %}
+                <div class="alert alert-success alert-dismissible fade show" role="alert">
+                   <strong>{{ message }}</strong>
+                       <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                           <span aria-hidden="true">&times;</span>
+                       </button>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+
+
+    <div class="container">
+        <h2 class="col-12 mb-5">Lista uzytkownikow(wspolautorow):</h2>
+    <table>
+        <thead>
+            <tr>
+                <th>Uzytkownik(email)</th>
+                <th>Imie</th>
+                <th>Nazwisko</th>
+                <th>Akcja</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for creator_item in creator %}
+            <tr>
+                <td>{{ creator_item.user }}</td>
+                <td>{{ creator_item.name }}</td>
+                <td>{{ creator_item.surname }}</td>
+                <td><a href="{{ path('admin_creator_update', {'id': creator_item.id}) }}" class="btn-link">Modyfikuj</a></td>
+            </tr>
+        {% endfor %}
+            </tbody>
+            </table>
+            </div>
+
+{% endblock %}

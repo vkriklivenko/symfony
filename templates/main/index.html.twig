@@ -1,0 +1,69 @@
+{% extends 'main/base.html.twig' %}
+{% block title %}{{ title }}{% endblock %}
+{% block body %}
+
+
+    <div class="container-fluid">
+        <div class="row no-gutters justify-content-center mt-5">
+            <div class="col-12 col-lg-6 col-md-6">
+                <h1 class="display-4 text-center">
+                    {{ title }}
+                </h1>
+            </div>
+        </div>
+    </div>
+
+    <div class="container-fluid">
+        <div class="row no-gutters">
+            <div class="col-12">
+                <h1 class="display-4 text-center mt-5">
+                    <h2 class="col-12 mb-5"> Wszystkie publikacje:</h2>
+                    <form action="{{ path('export')}}" method="post"></form>
+                    <input type="submit" name="submit_docs" value="Export" class="btn btn-success ml-0">
+                    <table>
+                        <thead>
+                        <tr>
+                            <th>Export</th>
+                            <th>{{knp_pagination_sortable(pagination, 'Tytul', 'a.title')}}<input type="checkbox" name="title" class="ml-3"></th>
+                            <th>{{knp_pagination_sortable(pagination, 'Rok', 'a.year')}}<input type="checkbox" name="year" class="ml-3"></th>
+                            <th>{{knp_pagination_sortable(pagination, 'Liczba punktow', 'a.numOfPoints')}}<input type="checkbox" name="numOfPoints" class="ml-3"></th>
+                            <th>{{knp_pagination_sortable(pagination, 'Konferencja', 'a.conference')}}<input type="checkbox" name="conference" class="ml-3"></th>
+                            {% for creators in creator %}
+                            <th>{{knp_pagination_sortable(pagination, 'Kto stworzyl', 'a.creator')}}<input type="checkbox" name="creator" class="ml-3"></th>
+                            <th>{{knp_pagination_sortable(pagination, 'Udzial', 'a.participation')}}<input type="checkbox" name="participation" class="ml-3"></th>
+                            {% endfor %}
+                        </tr>
+                        </thead>
+                        <tbody>
+                        {% for post_item in pagination %}
+                        <tr>
+                            <td><input type="checkbox" name="row_{{ post_item.title }}" /></td>
+                            <td>{{ post_item.title }}</td>
+                            <td>{{ post_item.year|date('Y-m-d') }}</td>
+                            <td>{{ post_item.numOfPoints }}</td>
+                            <td>{{ post_item.conference }}</td>
+                            {% endfor %}
+                            {% for creators in creator %}
+                            <td>{{ creators.user }}</td>
+                            <td>{{ creators.participation }}</td>
+                            {% endfor %}
+                        </tr>
+                        </tbody>
+                    </table>
+                </h1>
+
+                <div class="container-fluid">
+                    <div class="row no-gutters justify-content-center mt-5">
+                        <div class="col-2">
+                            <div class="navigation">
+                                {{ knp_pagination_render(pagination) }}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+{% endblock %}

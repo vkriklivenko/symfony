@@ -1,0 +1,26 @@
+{% extends 'main/base.html.twig' %}
+
+{% block body %}
+    <div class="container-fluid ml-5 mt-5">
+    <div class="row">
+        <div class="col-8">
+            <h2>Welcome</h2>
+            {{ form_start(form) }}
+            {{ form_row(form.title) }}
+            <div class="col-sm-8 col-sm-offset-2" id="creator_list" data-prototype="{{ form_widget(form.creator.vars.prototype)|e('html_attr') }}">
+                {% for row in form.creator %}
+                    <div class="panel panel-warning">
+                        <div class="panel-heading">
+                            <strong>{{ row.vars.value.user }}</strong>
+                        </div>
+                        <div class="panel-body">
+                            {{ form_row(row) }}
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+            {{ form_end(form) }}
+        </div>
+    </div>
+    </div>
+{% endblock %}

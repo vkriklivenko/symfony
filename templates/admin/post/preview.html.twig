@@ -1,0 +1,27 @@
+{% extends "admin/adminbase.html.twig" %}
+{% block title %}
+    Export file
+{% endblock %}
+{% block body %}
+{#    {% if publishes is defined %}#}
+        <h3>Publikacje: </h3>
+        <table style="border: 1px #000000 solid; border-collapse: collapse">
+            <thead>
+            <tr>
+                {% for column in columns %}
+                    <th style="border: 1px #000000 solid; border-collapse: collapse">{{ column }}</th>
+                {% endfor %}
+            </tr>
+            </thead>
+            <tbody>
+            {% for publish in publishes %}
+                <tr>
+                    {% for field in publish %}
+                        <td style="border: 1px #000000 solid; border-collapse: collapse">{{ field }}</td>
+                    {% endfor %}
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+{#    {% endif %}#}
+{% endblock %}

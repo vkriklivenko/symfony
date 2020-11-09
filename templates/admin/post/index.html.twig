@@ -1,0 +1,85 @@
+{% extends 'admin/adminbase.html.twig' %}
+{% block body %}
+    <div class="container-fluid">
+        <div class="row no-gutters">
+            <div class="col-12">
+                <h1 class="display-4 text-center mt-5">
+                    {{ title }}
+                </h1>
+            </div>
+        </div>
+    </div>
+    <div class="container mb-5">
+        <div class="row no-gutters">
+            {% if check_creator is not empty %}
+            <div class="col-12">
+                <a href="{{ path('admin_post_create') }}" class="btn btn-success mt-5">Utworz wpis</a>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <div class="container">
+        <div class="row no-gutters justify-content-center mt-3">
+            <div class="col-8">
+                {% for message in app.flashes('success') %}
+                    <div class="alert alert-success alert-dismissible fade show" role="alert">
+                        <strong>{{ message }}</strong>
+                        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+
+    <div class="container">
+        {% if check_creator is empty %}
+            <div class="alert alert-success alert-dismissible fade show" role="alert">
+                <strong>Tworzenie publikacji niemożliwe, proszę o stworzenie współautora</strong>
+                <hr>
+                <a href="{{ path('admin_creator_create') }}">
+                    Stworzyc wspolautora
+                </a>
+            </div>
+            {% else %}
+        <h2 class="col-12 mb-5"> Wszystkie publikacje:</h2>
+        <table>
+            <thead>
+            <tr>
+                <th>Akcja</th>
+                <th>Tytul</th>
+                <th>Rok</th>
+                <th>Points</th>
+                <th>Konferencja</th>
+                {% for check_creator in creator %}
+                <th>Kto stworzył</th>
+                <th>Udział</th>
+                {% endfor %}
+            </tr>
+            </thead>
+            <tbody>
+            {% for post_item in post %}
+            <tr>
+                <td><a href="{{ path('admin_post_update', {'id': post_item.id}) }}" class="btn-link">Modyfikuj</a></td>
+                <td>{{ post_item.title }}</td>
+                <td>{{ post_item.year|date('Y-m-d') }}</td>
+                <td>{{ post_item.numOfPoints }}</td>
+                <td>{{ post_item.conference }}</td>
+
+                {% endfor %}
+                {% for check_creator in creator %}
+                <td>{{ check_creator.user }}</td>
+                <td>{{ check_creator.participation }}</td>
+                {% endfor %}
+
+            </tr>
+
+            </tbody>
+        </table>
+
+        {% endif %}
+    </div>
+
+{% endblock %}
