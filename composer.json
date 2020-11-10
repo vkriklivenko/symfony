@@ -10,6 +10,7 @@
         "doctrine/doctrine-bundle": "^2.1",
         "doctrine/doctrine-migrations-bundle": "^3.0",
         "doctrine/orm": "^2.7",
+        "dompdf/dompdf": "^0.8.6",
         "knplabs/knp-paginator-bundle": "^5.3",
         "phpdocumentor/reflection-docblock": "^5.2",
         "phpoffice/phpword": "^0.17.0",

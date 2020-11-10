@@ -59,7 +59,7 @@ class HomeController extends BaseController
      * @return Response
      * @throws Exception
      */
-    public function export(Request $request, PostRepository $postRepository)
+    public function export(Request $request, PostRepository $postRepository, EntityManagerInterface $em)
     {
         $all = true;
         $columns = '';
@@ -101,7 +101,7 @@ class HomeController extends BaseController
         } else {
             $rows = rtrim($ids, ',');
         }
-        $publishes = $postRepository->createQueryBuilder('p')->select($columns);
+        $publishes = $postRepository->createQueryBuilder('a')->select($columns);
 
         if (!empty($rows)) {
             $publishes = $publishes->where("a.title IN (" . $rows . ")");
