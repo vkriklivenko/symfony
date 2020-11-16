@@ -5,6 +5,7 @@ namespace App\Repository;
 use App\Entity\Post;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\ORM\EntityManagerInterface;
+use Doctrine\ORM\Query\Expr\Join;
 use Doctrine\Persistence\ManagerRegistry;
 
 /**
@@ -55,5 +56,28 @@ class PostRepository extends ServiceEntityRepository implements PostRepositoryIn
     {
         $this->manager->remove($post);
         $this->manager->flush();
+    }
+
+    /**
+     * @param $term
+     * @return Post[]
+     */
+    public function findCreators($term): array
+    {
+        $terms = explode(" ", $term);
+
+        $qb = $this->createQueryBuilder('a')
+            ->select('a c')
+            ->leftJoin('a.creator', 'c')
+        ;
+        $qb = $qb->andWhere($qb->expr()->orX(
+            $qb->expr()->in('a.title', ":term"),
+            $qb->expr()->in('a.year', ":term"),
+            $qb->expr()->in('a.numOfPoints', ":term"),
+            $qb->expr()->in('a.conference', ":term")
+        ));
+        $qb->setParameter('term', $terms);
+
+        return $qb->getQuery()->execute();
     }
 }

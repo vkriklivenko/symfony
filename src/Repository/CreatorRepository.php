@@ -5,6 +5,7 @@ namespace App\Repository;
 use App\Entity\Creator;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\ORM\EntityManagerInterface;
+use Doctrine\ORM\Query\Expr\Join;
 use Doctrine\Persistence\ManagerRegistry;
 
 /**
@@ -60,5 +61,23 @@ class CreatorRepository extends ServiceEntityRepository implements CreatorReposi
     {
         $this->manager->remove($creator);
         $this->manager->flush();
+    }
+
+    /**
+     * @param $term
+     * @return Creator[]
+     */
+    public function findCreators($term)
+    {
+        $qb = $this->createQueryBuilder('c');
+
+        $terms = explode(" ", $term);
+        $qb = $qb->andWhere($qb->expr()->orX(
+            $qb->expr()->in('c.user', ":term"),
+            $qb->expr()->in('c.participation', ":term")
+        ));
+        $qb->setParameter('term', $terms);
+
+        return $qb->getQuery()->execute();
     }
 }
