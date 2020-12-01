@@ -13,6 +13,7 @@ use App\Repository\PostRepository;
 use App\Repository\PostRepositoryInterface;
 use App\Repository\UserRepository;
 use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -31,15 +32,21 @@ class AdminPostController extends AdminBaseController
 
     /**
      * @Route("/admin/post", name="admin_post")
+     * @param EntityManagerInterface $em
+     * @return Response
      */
-    public function index()
+    public function index(PostRepositoryInterface $post, EntityManagerInterface $em)
     {
+        $post = $em->getRepository(Post::class)->findAll();
+        $checkCreator = $em->getRepository(Creator::class)->findAll();
         $forRender = parent::renderDefault();
-        $forRender['title'] = 'Wszystkie publikacje';
-        $forRender['post'] = $this->postRepository->getAllPost();
-        $forRender['creator'] = $this->creatorRepository->getAllCreator();
-        $forRender['check_creator'] = $this->creatorRepository->getAllCreator();
-        return $this->render('admin/post/index.html.twig', $forRender);
+        $forRender['check_creator'] = $checkCreator;
+
+        return $this->render('admin/post/index.html.twig', [
+            'title' => 'Wszystkie publikacje',
+            'post' => $post,
+            'check_creator' => $checkCreator
+        ]);
     }
 
     /**

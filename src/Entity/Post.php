@@ -57,12 +57,6 @@ class Post
      */
     private $creator;
 
-//    /**
-//     * @ORM\ManyToOne(targetEntity=User::class)
-//     * @ORM\JoinColumn(nullable=false)
-//     */
-//    private $post;
-
     /**
      * @ORM\Column(type="datetime", nullable=true)
      */

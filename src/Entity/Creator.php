@@ -23,7 +23,7 @@ class Creator
     /**
      * @ORM\Column(type="string", length=255)
      */
-    private $user;
+    public $user;
 
     /**
      * @ORM\Column(type="string", length=255, nullable=true)

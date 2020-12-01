@@ -53,7 +53,7 @@
                 <th>Rok</th>
                 <th>Points</th>
                 <th>Konferencja</th>
-                {% for check_creator in creator %}
+                {% for post_item in post %}
                 <th>Kto stworzył</th>
                 <th>Udział</th>
                 {% endfor %}
@@ -67,13 +67,10 @@
                 <td>{{ post_item.year|date('Y-m-d') }}</td>
                 <td>{{ post_item.numOfPoints }}</td>
                 <td>{{ post_item.conference }}</td>
-
-                {% endfor %}
-                {% for check_creator in creator %}
-                <td>{{ check_creator.user }}</td>
-                <td>{{ check_creator.participation }}</td>
-                {% endfor %}
-
+                {% for check_creators in post_item.creator %}
+                <td>{{ check_creators.user }}</td>
+                <td>{{ check_creators.participation }}</td>
+                {% endfor %}{% endfor %}
             </tr>
 
             </tbody>

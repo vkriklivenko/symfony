@@ -29,9 +29,9 @@ class CreatorRepository extends ServiceEntityRepository implements CreatorReposi
         return parent::findAll();
     }
 
-    public function getOneCreator(int $categoryId): object
+    public function getOneCreator(int $creatorId): object
     {
-        return parent::find($categoryId);
+        return parent::find($creatorId);
     }
 
     public function setCreateCreator(Creator $creator): object
@@ -69,9 +69,12 @@ class CreatorRepository extends ServiceEntityRepository implements CreatorReposi
      */
     public function findCreators($term)
     {
-        $qb = $this->createQueryBuilder('c');
-
         $terms = explode(" ", $term);
+
+        $qb = $this->createQueryBuilder('c')
+            ->select('c a')
+            ->leftJoin('c.id', 'a')
+        ;
         $qb = $qb->andWhere($qb->expr()->orX(
             $qb->expr()->in('c.user', ":term"),
             $qb->expr()->in('c.participation', ":term")

@@ -3,7 +3,9 @@
 
 namespace App\Controller\Main;
 
+use App\Entity\Creator;
 use App\Entity\Post;
+use App\Form\SearchForm;
 use App\Repository\CreatorRepository;
 use App\Repository\CreatorRepositoryInterface;
 use App\Repository\PostRepository;
@@ -38,16 +40,13 @@ class HomeController extends BaseController
         $dql = "SELECT a FROM App:Post a";
         $query = $em->createQuery($dql);
 
-        $post = $em->getRepository(Post::class)->findAll();
-        $creator = $this->creatorRepository->getAllCreator();
+        $creator = $em->getRepository(Creator::class)->findAll();
         $forRender = parent::renderDefault();
-        $forRender['post'] = $post;
-        $forRender['creator'] = $this->creatorRepository->getAllCreator();
+        $forRender['creator'] = $creator;
         return $this->render('main/index.html.twig', [
             'title' => 'Bibliometr',
-            'post' => $post,
-            'creator' => $creator,
-            'pagination' => $paginator->paginate($query, $request->query->getInt('page', 1), 3)
+            'pagination' => $paginator->paginate($query, $request->query->getInt('page', 1), 3),
+            'creator' => $creator
         ]);
     }
 
@@ -55,33 +54,31 @@ class HomeController extends BaseController
      * @Route("/export", name="export", methods={"POST"})
      * @param Request $request
      * @param PostRepository $postRepository
-     * @param EntityManagerInterface $em
      * @param CreatorRepository $creatorRepository
      * @return Response
      * @throws Exception
      */
-    public function export(Request $request, PostRepository $postRepository, EntityManagerInterface $em, CreatorRepository $creatorRepository)
+    public function export(Request $request, PostRepository $postRepository, CreatorRepository $creatorRepository)
     {
-        $columns = ' ';
+        $columns = '   ';
         $all = true;
-
-
+        $em = $this->getDoctrine()->getManager();
 
         if (!empty($request->get('title'))) {
             $columns = 'a.title,';
         }
         if (!empty($request->get('year'))) {
-            $columns = $columns.'a.year,';
+            $columns = $columns.'a.year, ';
         }
            if (!empty($request->get('numOfPoints'))) {
             $columns = $columns.' a.numOfPoints,';
         }
-        if (!empty($request->get('Konferencja'))) {
+        if (!empty($request->get('conference'))) {
             $columns = $columns.' a.conference,';
         }
         //Creators
         if (!empty($request->get('user'))) {
-            $columns = $columns.' c.user,';
+            $columns = $columns.' c.creator,';
         }
         if (!empty($request->get('participation'))) {
             $columns = $columns.' c.participation,';
@@ -111,10 +108,15 @@ class HomeController extends BaseController
         } else {
             $rows = rtrim($ids, ',');
         }
-        $publishes = $postRepository->createQueryBuilder('a')->select($columns);
-//        $creators = $creatorRepository->createQueryBuilder('c')->select($columns);
 
-        $publishes = $publishes->getQuery()->getResult();
+        $publishes = $postRepository->createQueryBuilder('a')->select($columns)->leftJoin('App:Creator', 'c', 'WITH', 'c.id = a.id')->addSelect('c')->getQuery()->execute();
+//        $creators = $em->getRepository(Creator::class)->findAll();
+        if (!empty($rows)){
+            $publishes = $publishes->where("a.title IN (". $rows . ")");
+//            $creators = $creators->where("c.user IN (". $rows . ")");
+        }
+
+//        $publishes = $publishes->getQuery()->getResult();
 //        $creators = $creators->getQuery()->getResult();
 
         $pubs = [];
@@ -134,10 +136,7 @@ class HomeController extends BaseController
 //        foreach ($creators as $creator) {
 //            $isEmpty = true;
 //            foreach ($creators as $field) {
-//                if ($field instanceof \DateTime) {
-//                    $creators['year'] = $field->format('Y-m-d');
-//                }
-//                if ($field) $isEmpty = false;
+//               if ($field) $isEmpty = false;
 //            }
 //            if (!$isEmpty) array_push($crears, $creator);
 //        }
@@ -146,7 +145,7 @@ class HomeController extends BaseController
             $columns = str_replace('a.', '', $columns);
             $columns = explode(',', $columns);
         }
-
+//
 //        if ($columns !== 'c') {
 //            $columns = str_replace('c.', '', $columns);
 //            $columns = explode(',', $columns);
@@ -164,7 +163,7 @@ class HomeController extends BaseController
             // Retrieve the HTML generated in our twig file
             $html = $template->renderBlock('body',[
                 'publishes' => $pubs,
-//                'creators' => $crears,
+                'creators' => $crears,
                 'columns' => $columns,
             ]);
 
@@ -180,9 +179,33 @@ class HomeController extends BaseController
 
             return $this->render('admin/post/preview.html.twig', [
                 'publishes' => $pubs,
-//                'creators' => $crears,
+                'creators' => $crears,
                 'columns' => $columns,
             ]);
         }
+    }
+
+    /**
+     * @Route("/search", name="search")
+     * @param Request $request
+     * @return Response
+     */
+    public function searchAction(Request $request)
+    {
+        $postRepo = $this->getDoctrine()->getRepository('App:Post');
+        $searchForm = $this->createForm(SearchForm::class);
+        $searchForm->handleRequest($request);
+        $posts = null;
+        if($searchForm->isSubmitted()){
+            $data = $searchForm->getData();
+            $posts = $postRepo->findByTitle($data['search']);
+        }
+
+        return $this->render('main/search.html.twig',[
+            'title' => 'Bibliometr',
+            'posts' => $posts,
+            'form' => $searchForm->createView(),
+        ]);
+
     }
 }

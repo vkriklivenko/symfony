@@ -62,22 +62,31 @@ class PostRepository extends ServiceEntityRepository implements PostRepositoryIn
      * @param $term
      * @return Post[]
      */
-    public function findCreators($term): array
+    public function findPosts($term): array
     {
         $terms = explode(" ", $term);
 
         $qb = $this->createQueryBuilder('a')
-            ->select('a c')
             ->leftJoin('a.creator', 'c')
+            ->addSelect('c')
         ;
         $qb = $qb->andWhere($qb->expr()->orX(
             $qb->expr()->in('a.title', ":term"),
             $qb->expr()->in('a.year', ":term"),
             $qb->expr()->in('a.numOfPoints', ":term"),
-            $qb->expr()->in('a.conference', ":term")
+            $qb->expr()->in('a.conference', ":term"),
+            $qb->expr()->in('c.user', ":term"),
+            $qb->expr()->in('c.participation', ":term")
         ));
         $qb->setParameter('term', $terms);
 
         return $qb->getQuery()->execute();
+    }
+
+    public function findByTitle($title)
+    {
+        $db = $this->createQueryBuilder('a')->where('a.title LIKE :title');
+        $db->setParameter('title', '%'.$title.'%');
+        return $db->getQuery()->getResult();
     }
 }

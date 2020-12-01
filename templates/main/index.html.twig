@@ -13,6 +13,11 @@
         </div>
     </div>
 
+    <form action="{{ path('search') }}" method="post">
+        <input type="text" name="search" placeholder="wyszukaj">
+        <input type="submit" name="search" value="szukaj">
+    </form>
+
     <div class="container-fluid">
         <div class="row no-gutters">
             <div class="col-12">
@@ -28,9 +33,9 @@
                             <th>{{knp_pagination_sortable(pagination, 'Rok', 'a.year')}}<input type="checkbox" name="year" class="ml-3"></th>
                             <th>{{knp_pagination_sortable(pagination, 'Liczba punktow', 'a.numOfPoints')}}<input type="checkbox" name="numOfPoints" class="ml-3"></th>
                             <th>{{knp_pagination_sortable(pagination, 'Konferencja', 'a.conference')}}<input type="checkbox" name="conference" class="ml-3"></th>
-                            {% for creators in creator %}
-                            <th>{{knp_pagination_sortable(pagination, 'Kto stworzyl', 'a.creator')}}<input type="checkbox" name="creator" class="ml-3"></th>
-                            <th>{{knp_pagination_sortable(pagination, 'Udzial', 'a.participation')}}<input type="checkbox" name="participation" class="ml-3"></th>
+                            {% for post_item in pagination %}
+                            <th>Kto stworzyl<input type="checkbox" name="creator" class="ml-3"></th>
+                           <th>Udzial<input type="checkbox" name="participation" class="ml-3"></th>
                             {% endfor %}
                         </tr>
                         </thead>
@@ -42,14 +47,14 @@
                             <td>{{ post_item.year|date('Y-m-d') }}</td>
                             <td>{{ post_item.numOfPoints }}</td>
                             <td>{{ post_item.conference }}</td>
-                            {% endfor %}
-                            {% for creators in creator %}
+                            {% for creators in post_item.creator %}
                             <td>{{ creators.user }}</td>
                             <td>{{ creators.participation }}</td>
-                            {% endfor %}
+                            {% endfor %}{% endfor %}
                         </tr>
                         </tbody>
                     </table>
+                    </form>
                 </h1>
 
                 <div class="container-fluid">
