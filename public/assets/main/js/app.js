@@ -18,7 +18,19 @@ $(document).ready(function () {
         e.preventDefault;
         //create a new form and append it to the collectionHolder
         addNewForm();
-    })
+    });
+
+    $('#remove_filters').click(function (e) {
+        e.preventDefault();
+        var form = $('#filters-form');
+        if (form) {
+            var elements = form[0].elements;
+            for (var i = 0, element; element = elements[i++];) {
+                element.value = null;
+            }
+            form.submit();
+        }
+    });
 
 });
 

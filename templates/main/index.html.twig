@@ -12,10 +12,13 @@
             </div>
         </div>
     </div>
-
-    <form action="{{ path('search') }}" method="post">
-        <input type="text" name="search" placeholder="wyszukaj">
+    <form action="{{ path('search') }}" method="post" id="filters-form">
+        <input type="text" name="keyword" placeholder="wyszukaj" id="keyword" {% if filters is defined %} value="{{ filters['keyword'] }}" {% endif %}>
+        <input type="number" min="1900" max="2099" step="1" name="from" {% if filters is defined %} value="{{ filters['from'] }}" {% endif %}/>
+        <input type="number" min="1900" max="2099" step="1" name="to" {% if filters is defined %}  value="{{ filters['to'] }}" {% endif %} />
+        <input type="text" name="num_of_points" placeholder="Liczba punktow " id="num_of_points" {% if filters is defined %} value="{{ filters['num_of_points'] }}" {% endif %}>
         <input type="submit" name="search" value="szukaj">
+        <input type="button" name="remove_filters" id="remove_filters" value="usuń filtry">
     </form>
 
     <div class="container-fluid">
@@ -24,6 +27,9 @@
                 <h1 class="display-4 text-center mt-5">
                     <h2 class="col-12 mb-5"> Wszystkie publikacje:</h2>
                     <form action="{{ path('export') }}" method="POST">
+                        {% if filters is defined %}
+                            <input type="hidden" name="filters" value="{{ filters|json_encode() }}">
+                        {% endif %}
                     <input type="submit" name="submit_docs" value="Export" class="btn btn-success ml-0">
                     <table>
                         <thead>
@@ -42,7 +48,7 @@
                         <tbody>
                         {% for post_item in pagination %}
                         <tr>
-                            <td><input type="checkbox" name="row_{{ post_item.title }}" /></td>
+                            <td><input type="checkbox" name="row_{{ post_item.id }}" /></td>
                             <td>{{ post_item.title }}</td>
                             <td>{{ post_item.year|date('Y-m-d') }}</td>
                             <td>{{ post_item.numOfPoints }}</td>

@@ -83,10 +83,63 @@ class PostRepository extends ServiceEntityRepository implements PostRepositoryIn
         return $qb->getQuery()->execute();
     }
 
-    public function findByTitle($title)
+    /**
+     * @param null $filters
+     * @return array|mixed
+     */
+    public function findAllPosts($filters = null)
     {
-        $db = $this->createQueryBuilder('a')->where('a.title LIKE :title');
-        $db->setParameter('title', '%'.$title.'%');
+        $db = $this->createQueryBuilder('a');
+        if (count($filters)) {
+            $this->applyFilters($db, $filters);
+        }
+
         return $db->getQuery()->getResult();
+    }
+
+    public function findAllToExport($columns, $rows = null, $filters = [])
+    {
+        $query = $this->createQueryBuilder('a')->select($columns)->leftJoin('App:Creator', 'c', 'WITH', 'c.id = a.id');
+
+        if ($rows){
+            $query->where("a.id IN (". $rows . ")");
+        }
+
+        if (count($filters)) {
+            $this->applyFilters($query, $filters);
+        }
+
+        return $query->getQuery()->getResult(\Doctrine\ORM\Query::HYDRATE_ARRAY);
+
+    }
+
+    protected function applyFilters($queryBuilder, $filters)
+    {
+        if (count($filters)) {
+            foreach ($filters as $filter => $value) {
+                if ($value) {
+                    switch ($filter) {
+                        case 'keyword':
+                            $queryBuilder->andWhere('a.title LIKE :keyword')
+                                ->setParameter('keyword', '%' . $value . '%');
+                            break;
+                        case 'from':
+                            $date = date("Y-m-d H:i:s", strtotime($value . '-01-01 00:00:00'));
+                            $queryBuilder->andWhere('a.year >= :from')
+                                ->setParameter('from', $date);
+                            break;
+                        case 'to':
+                            $date = date("Y-m-d H:i:s", strtotime($value . '-12-31 23:59:59'));
+                            $queryBuilder->andWhere('a.year <= :to')
+                                ->setParameter('to', $date);
+                            break;
+                        case 'num_of_points':
+                            $queryBuilder->andWhere('a.numOfPoints = :points')
+                                ->setParameter('points', $value);
+                            break;
+                    }
+                }
+            }
+        }
     }
 }
