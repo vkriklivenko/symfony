@@ -20,6 +20,26 @@ $(document).ready(function () {
         addNewForm();
     });
 
+    $('#filters-form').submit(function (e) {
+        var filters = [];
+        $.each($( this ).serializeArray(), function(i, field) {
+           if (field.value !== '') {
+               filters.push(field);
+           }
+        });
+        var filterString = '';
+        if (filters.length > 0) {
+            filters.forEach(function (filter, index) {
+                let cont = '&'
+                if (index === 0) {
+                    cont = '?'
+                }
+                filterString += cont + filter.name + '=' + filter.value;
+            })
+        }
+        $(this).attr('action', $(this).attr('action') + filterString);
+    });
+
     $('#remove_filters').click(function (e) {
         e.preventDefault();
         var form = $('#filters-form');

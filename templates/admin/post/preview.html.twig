@@ -14,20 +14,25 @@
             </tr>
             </thead>
             <tbody>
-            {% for publish in publishes %}
-                <tr>
-                    {% for field in publish %}
-                        <td style="border: 1px #000000 solid; border-collapse: collapse">{{ field }}</td>
-                    {% endfor %}
-                </tr>
+            {% for items in publishes %}
+                {% for publish in items %}
+                    <tr style="height: auto">
+                        {% for field in publish %}
+                            <td style="border: 1px #000000 solid; border-collapse: collapse">{{ field }}</td>
+                        {% endfor %}
+                        {% if creators[publish['id']] is defined %}
+                            {% for creator in creators[publish['id']] %}
+                                <td style="border: 1px #000000 solid; border-collapse: collapse">
+                                {% for field in creator %}
+                                    {{ field }} <br />
+                                {% endfor %}
+                                </td>
+                            {% endfor %}
+                        {% endif %}
+                    </tr>
+                {% endfor %}
             {% endfor %}
-{#            {% for creator in creators %}#}
-{#                <tr>#}
-{#                {% for field in creators %}#}
-{#                    <td style="border: 1px #000000 solid; border-collapse: collapse">{{ field }}</td>#}
-{#                {% endfor %}#}
-{#                </tr>#}
-{#            {% endfor %}#}
+
             </tbody>
         </table>
 {#    {% endif %}#}

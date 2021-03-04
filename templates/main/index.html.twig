@@ -13,10 +13,10 @@
         </div>
     </div>
     <form action="{{ path('search') }}" method="post" id="filters-form">
-        <input type="text" name="keyword" placeholder="wyszukaj" id="keyword" {% if filters is defined %} value="{{ filters['keyword'] }}" {% endif %}>
-        <input type="number" min="1900" max="2099" step="1" name="from" {% if filters is defined %} value="{{ filters['from'] }}" {% endif %}/>
-        <input type="number" min="1900" max="2099" step="1" name="to" {% if filters is defined %}  value="{{ filters['to'] }}" {% endif %} />
-        <input type="text" name="num_of_points" placeholder="Liczba punktow " id="num_of_points" {% if filters is defined %} value="{{ filters['num_of_points'] }}" {% endif %}>
+        <input type="text" name="keyword" placeholder="wyszukaj" id="keyword" {% if filters['keyword'] is defined %} value="{{ filters['keyword'] }}" {% endif %}>
+        <input type="number" min="1900" max="2099" step="1" name="from" {% if filters['from'] is defined %} value="{{ filters['from'] }}" {% endif %}/>
+        <input type="number" min="1900" max="2099" step="1" name="to" {% if filters['to'] is defined %}  value="{{ filters['to'] }}" {% endif %} />
+        <input type="text" name="num_of_points" placeholder="Liczba punktow " id="num_of_points" {% if filters['num_of_points'] is defined %} value="{{ filters['num_of_points'] }}" {% endif %}>
         <input type="submit" name="search" value="szukaj">
         <input type="button" name="remove_filters" id="remove_filters" value="usuń filtry">
     </form>
@@ -41,7 +41,7 @@
                             <th>{{knp_pagination_sortable(pagination, 'Konferencja', 'a.conference')}}<input type="checkbox" name="conference" class="ml-3"></th>
                             {% for post_item in pagination %}
                             <th>Kto stworzyl<input type="checkbox" name="creator" class="ml-3"></th>
-                           <th>Udzial<input type="checkbox" name="participation" class="ml-3"></th>
+                            <th>Udzial<input type="checkbox" name="participation" class="ml-3"></th>
                             {% endfor %}
                         </tr>
                         </thead>
@@ -67,7 +67,7 @@
                     <div class="row no-gutters justify-content-center mt-5">
                         <div class="col-2">
                             <div class="navigation">
-                                {{ knp_pagination_render(pagination) }}
+                                {{ knp_pagination_render(pagination)}}
                             </div>
                         </div>
                     </div>

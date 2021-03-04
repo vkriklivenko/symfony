@@ -99,7 +99,7 @@ class PostRepository extends ServiceEntityRepository implements PostRepositoryIn
 
     public function findAllToExport($columns, $rows = null, $filters = [])
     {
-        $query = $this->createQueryBuilder('a')->select($columns)->leftJoin('App:Creator', 'c', 'WITH', 'c.id = a.id');
+        $query = $this->createQueryBuilder('a')->select($columns)->leftJoin('App:Creator', 'c', 'WITH', 'c.post = a.id');
 
         if ($rows){
             $query->where("a.id IN (". $rows . ")");
@@ -108,6 +108,8 @@ class PostRepository extends ServiceEntityRepository implements PostRepositoryIn
         if (count($filters)) {
             $this->applyFilters($query, $filters);
         }
+
+        $query->orderBy('a.id');
 
         return $query->getQuery()->getResult(\Doctrine\ORM\Query::HYDRATE_ARRAY);
 

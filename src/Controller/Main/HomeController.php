@@ -79,8 +79,8 @@ class HomeController extends BaseController
         }
 
         //Creators
-        if (!empty($request->get('user'))) {
-            $columns[] ='c.creator AS Kto_stworzyl';
+        if (!empty($request->get('creator'))) {
+            $columns[] ='c.user AS Kto_stworzyl';
         }
         if (!empty($request->get('participation'))) {
             $columns[] = 'c.participation AS Udzial';
@@ -96,6 +96,8 @@ class HomeController extends BaseController
             ];
         }
 
+        array_unshift($columns, 'a.id');
+
         $ids = [];
         for ($i = 1; $i <= 10; $i++) {
             if (null !== $request->get("row_" . $i)) {
@@ -105,33 +107,45 @@ class HomeController extends BaseController
 
         $columns = implode(',', $columns);
         $rows = implode(',', $ids);
-
         $filtersString = $request->request->get('filters', '{}');
         $publishes = $postRepository->findAllToExport($columns, $rows, json_decode($filtersString, true));
         $pubs = [];
-        $crears = [];
+        $creators = [];
+        foreach ($publishes as $index => $publish) {
+            if (isset($publish['Kto_stworzyl'])) {
+                $creators[$publish['id']]['creators'][] = $publish['Kto_stworzyl'];
+            }
+
+            if (isset($publish['Udzial'])) {
+                $creators[$publish['id']]['part'][] = $publish['Udzial'];
+            }
+        }
+//        dump($creators); die();
+
+        $crears = $publishes;
+
+        $columnsToRender = array_keys(array_shift($crears));
         foreach ($publishes as $publish) {
             $isEmpty = true;
             if ($publish) {
                 foreach ($publish as $index => $field) {
+                    if (in_array($index, ['Udzial', 'Kto_stworzyl'])) {
+                        unset($publish[$index]);
+//                        if(isset($creators[$publish[$index]])) {
+//                            $publish['data'] = $creators[$publish[$index]];
+//                        }
+                    }
                     if ($field instanceof \DateTime) {
                         $publish['Rok'] = $field->format('Y-m-d');
                     }
                     if ($field) $isEmpty = false;
                 }
-                if (!$isEmpty) array_push($pubs, $publish);
+                if (!$isEmpty) {
+                    $pubs[$publish['id']] = [];
+                    array_push($pubs[$publish['id']], $publish);
+                }
             }
         }
-
-
-//
-//        foreach ($creators as $creator) {
-//            $isEmpty = true;
-//            foreach ($creators as $field) {
-//               if ($field) $isEmpty = false;
-//            }
-//            if (!$isEmpty) array_push($crears, $creator);
-//        }
 
         if ($columns !== 'a') {
             $columns = str_replace('a.', '', $columns);
@@ -144,21 +158,22 @@ class HomeController extends BaseController
 //        }
 
         if($columns) {
-
             // Instantiate Dompdf with our options
             $phpWord = new phpWord();
-
             $twig = $this->get('twig');
             /** @var \Twig_Template $template */
             $template = $twig->load('admin/post/preview.html.twig');
             // Retrieve the HTML generated in our twig file
+
+
             $html = $template->renderBlock('body',[
                 'publishes' => $pubs,
-                'creators' => $crears,
-                'columns' => array_keys($pubs[0]),
+                'creators' => $creators,
+                'columns' => $columnsToRender,
             ]);
 
             $section = $phpWord->addSection();
+
 
             \PhpOffice\PhpWord\Shared\Html::addHtml($section, $html);
             // Saving the document as OOXML file...
@@ -170,8 +185,8 @@ class HomeController extends BaseController
 
             return $this->render('admin/post/preview.html.twig', [
                 'publishes' => $pubs,
-                'creators' => $crears,
-                'columns' => $columns,
+                'creators' => $creators,
+                'columns' => $columnsToRender,
             ]);
         }
     }
@@ -190,12 +205,16 @@ class HomeController extends BaseController
         $searchForm = $this->createForm(SearchForm::class);
         $searchForm->handleRequest($request);
         $filters = $this->getRequestData($request);
+        if (count($filters) === 0) {
+            $filters = $request->query->all();
+        }
         $posts = $postRepo->findAllPosts($filters);
+
 
         $creator = $em->getRepository(Creator::class)->findAll();
         return $this->render('main/index.html.twig', [
             'title'      => 'Bibliometr',
-            'pagination' => $paginator->paginate($posts, $request->query->getInt('page', 1), 3),
+            'pagination' => $paginator->paginate($posts, $request->query->getInt('page', 1), 2),
             'creator'    => $creator,
             'filters'    => $filters
         ]);
