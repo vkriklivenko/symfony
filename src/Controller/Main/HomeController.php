@@ -173,9 +173,53 @@ class HomeController extends BaseController
             ]);
 
             $section = $phpWord->addSection();
+            $section->addText('Publikacje: ');
+
+            $styleTable = array('borderSize' => 6, 'borderColor' => '999999');
+            $cellRowSpan = array('vMerge' => 'restart', 'valign' => 'center', 'bgColor' => 'AFAFAF');
+            $cellRowContinue = array('vMerge' => 'continue');
+            $cellColSpan = array('gridSpan' => 2, 'valign' => 'center');
+            $cellHCentered = array('align' => 'center');
+            $cellVCentered = array('valign' => 'center');
+
+            $phpWord->addTableStyle('Colspan Rowspan', $styleTable);
+            $table = $section->addTable('Colspan Rowspan');
+
+            $table->addRow();
+            foreach ($columnsToRender as $column) {
+                $cell1 = $table->addCell(2000, $cellRowSpan);
+                $textrun1 = $cell1->addTextRun($cellHCentered);
+                $textrun1->addText($column);
+            }
+            foreach ($pubs as $pub) {
+                foreach ($pub as $item) {
+                    $table->addRow();
+                    foreach ($item as $field) {
+                        $cell = null;
+                        $text = null;
+                        $cell = $table->addCell(2000);
+                        $text = $cell->addTextRun($cellHCentered);
+                        $text->addText($field);
+                    }
+                    if(isset($creators[$item['id']])) {
+                        foreach ($creators[$item['id']] as $creator) {
+                            $cell = null;
+                            $text = null;
+                            $cell = $table->addCell(2000);
+                            $text = $cell->addTextRun($cellHCentered);
+                            $tempText = '';
+                            foreach ($creator as $i) {
+                                $tempText .= "\n" . $i;
+                            }
+                            $text->addText($tempText);
+                        }
+
+                    }
+                }
+            }
 
 
-            \PhpOffice\PhpWord\Shared\Html::addHtml($section, $html);
+//            \PhpOffice\PhpWord\Shared\Html::addHtml($section, $html);
             // Saving the document as OOXML file...
 
             $objWriter = \PhpOffice\PhpWord\IOFactory::createWriter($phpWord, 'Word2007');
