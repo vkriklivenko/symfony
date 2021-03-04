@@ -209,7 +209,7 @@ class HomeController extends BaseController
                             $text = $cell->addTextRun($cellHCentered);
                             $tempText = '';
                             foreach ($creator as $i) {
-                                $tempText .= "\n" . $i;
+                                $tempText .= "<w:br/>" . $i;
                             }
                             $text->addText($tempText);
                         }
